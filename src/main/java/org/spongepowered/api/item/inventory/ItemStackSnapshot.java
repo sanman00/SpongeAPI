@@ -57,6 +57,13 @@ public interface ItemStackSnapshot extends ImmutableDataHolder<ItemStackSnapshot
     int getCount();
 
     /**
+     * Returns true if this ItemStackSnapshot is empty.
+     *
+     * @return True if this ItemStackSnapshot is empty
+     */
+    boolean isEmpty();
+
+    /**
      * Creates a new {@link ItemStack} with all the data currently available
      * on this {@link ItemStackSnapshot}.
      *

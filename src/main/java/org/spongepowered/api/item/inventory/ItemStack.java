@@ -40,6 +40,7 @@ import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.text.translation.Translatable;
 
 import java.util.Map;
@@ -78,6 +79,14 @@ public interface ItemStack extends DataHolder, Translatable {
         return builder().itemType(itemType).quantity(quantity).build();
     }
 
+    /**
+     * Returns an empty {@link ItemStack}
+     *
+     * @return The empty ItemStack
+     */
+    static ItemStack empty() {
+        return builder().itemType(ItemTypes.NONE).build();
+    }
 
     /**
      * Gets the {@link ItemType} of this {@link ItemStack}.
@@ -134,6 +143,13 @@ public interface ItemStack extends DataHolder, Translatable {
      * @return True if this equals the ItemStack
      */
     boolean equalTo(ItemStack that);
+
+    /**
+     * Returns true if this ItemStack is empty.
+     *
+     * @return True if this ItemStack is empty
+     */
+    boolean isEmpty();
 
     @Override
     ItemStack copy();
