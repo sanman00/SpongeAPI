@@ -28,11 +28,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Objects;
+import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.ResettableBuilder;
 
+import java.util.Optional;
 import java.util.function.Function;
+
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Represents a modifier that will apply a function on a damage value to
@@ -40,6 +48,7 @@ import java.util.function.Function;
  * {@link Function} such that the output will be the final damage applied
  * to the {@link Entity}.
  */
+@Immutable
 public interface DamageModifier {
 
     /**
@@ -66,13 +75,28 @@ public interface DamageModifier {
     Cause getCause();
 
     /**
+     * Gets the contributing {@link ItemStackSnapshot} that provided the
+     * "reason" for this {@link DamageModifier} to exist. An example of a
+     * contributing {@link ItemStack} is if an {@link ItemTypes#DIAMOND_SWORD}
+     * provided an {@link ItemEnchantment} that provided a
+     * {@link DamageModifierTypes#WEAPON_ENCHANTMENT}, this modifier would have
+     * the {@link ItemStackSnapshot} for the weapon used. Some modifiers however,
+     * do not require an {@link ItemStack} to be the contributing factor for
+     * this modifier to exist.
+     *
+     * @return The contributing item, if available
+     */
+    Optional<ItemStackSnapshot> getContributingItem();
+
+    /**
      * A builder that creates {@link DamageModifier}s, for use in both plugin and
      * implementation requirements.
      */
     final class Builder implements ResettableBuilder<DamageModifier, Builder> {
 
-        DamageModifierType type;
-        Cause cause;
+        @Nullable DamageModifierType type;
+        @Nullable Cause cause;
+        @Nullable ItemStackSnapshot snapshot;
 
         Builder() {
         }
@@ -87,6 +111,16 @@ public interface DamageModifier {
          */
         public Builder type(DamageModifierType damageModifierType) {
             this.type = checkNotNull(damageModifierType);
+            return this;
+        }
+
+        public Builder item(ItemStack itemStack) {
+            item(checkNotNull(itemStack, "ItemStack").createSnapshot());
+            return this;
+        }
+
+        public Builder item(ItemStackSnapshot snapshot) {
+            this.snapshot = checkNotNull(snapshot, "ItemStackSnapshot");
             return this;
         }
 
@@ -117,6 +151,7 @@ public interface DamageModifier {
         public Builder from(DamageModifier value) {
             this.type = value.getType();
             this.cause = value.getCause();
+            this.snapshot = value.getContributingItem().orElse(null);
             return this;
         }
 
@@ -131,10 +166,12 @@ public interface DamageModifier {
         private static class ImplementedDamageModifier implements DamageModifier {
             private final DamageModifierType type;
             private final Cause cause;
+            @Nullable private final ItemStackSnapshot snapshot;
 
             ImplementedDamageModifier(Builder builder) {
-                this.type = builder.type;
-                this.cause = builder.cause;
+                this.type = checkNotNull(builder.type, "DamageType is null!");
+                this.cause = checkNotNull(builder.cause, "Cause is null!");
+                this.snapshot = builder.snapshot;
             }
 
             @Override
@@ -148,8 +185,13 @@ public interface DamageModifier {
             }
 
             @Override
-            public int hashCode() {
-                return Objects.hashCode(this.type, this.cause);
+            public Optional<ItemStackSnapshot> getContributingItem() {
+                return Optional.ofNullable(this.snapshot);
+            }
+
+            @Override
+            public int hashCode(){
+                    return Objects.hashCode(this.type, this.cause);
             }
 
             @Override
@@ -162,7 +204,8 @@ public interface DamageModifier {
                 }
                 final ImplementedDamageModifier other = (ImplementedDamageModifier) obj;
                 return Objects.equal(this.type, other.type)
-                       && Objects.equal(this.cause, other.cause);
+                       && Objects.equal(this.cause, other.cause)
+                       && Objects.equal(this.snapshot, other.snapshot);
             }
 
             @Override
@@ -170,6 +213,7 @@ public interface DamageModifier {
                 return Objects.toStringHelper("DamageModifier")
                     .add("type", this.type)
                     .add("cause", this.cause)
+                    .add("contributing", this.snapshot)
                     .toString();
             }
         }

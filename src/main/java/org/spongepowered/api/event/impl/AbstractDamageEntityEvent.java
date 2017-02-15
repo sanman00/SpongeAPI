@@ -27,7 +27,9 @@ package org.spongepowered.api.event.impl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.event.cause.entity.damage.DamageFunction;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifierType;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
@@ -41,11 +43,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-public abstract class AbstractDamageEntityEvent extends AbstractModifierEvent<DamageModifier> implements DamageEntityEvent {
+public abstract class AbstractDamageEntityEvent extends AbstractModifierEvent<DamageFunction, DamageModifier> implements DamageEntityEvent {
 
-    @UseField
-    protected double originalDamage;
-    @UseField protected List<Tuple<DamageModifier, Function<? super Double, Double>>> originalFunctions;
+    @UseField protected double originalDamage;
+    @UseField protected List<DamageFunction> originalFunctions;
 
     @UseField protected double baseDamage;
 
@@ -100,7 +101,7 @@ public abstract class AbstractDamageEntityEvent extends AbstractModifierEvent<Da
         checkNotNull(function, "Function was null!");
         int indexToAddTo = 0;
         boolean addAtEnd = true;
-        for (Iterator<Tuple<DamageModifier, Function<? super Double, Double>>> iterator = this.modifierFunctions.iterator(); iterator.hasNext(); ) {
+        for (Iterator<DamageFunction> iterator = this.modifierFunctions.iterator(); iterator.hasNext(); ) {
             Tuple<DamageModifier, Function<? super Double, Double>> tuple = iterator.next();
             if (tuple.getFirst().equals(damageModifier)) {
                 iterator.remove();
@@ -110,9 +111,9 @@ public abstract class AbstractDamageEntityEvent extends AbstractModifierEvent<Da
             indexToAddTo++;
         }
         if (addAtEnd) {
-            this.modifierFunctions.add(new Tuple<>(damageModifier, function));
+            this.modifierFunctions.add(new DamageFunction(damageModifier, function));
         } else {
-            this.modifierFunctions.add(indexToAddTo, new Tuple<>(damageModifier, function));
+            this.modifierFunctions.add(indexToAddTo, new DamageFunction(damageModifier, function));
         }
         this.recalculateDamages(this.baseDamage);
     }
@@ -132,9 +133,9 @@ public abstract class AbstractDamageEntityEvent extends AbstractModifierEvent<Da
 
         }
         if (indexToAddBefore == -1) {
-            this.modifierFunctions.add(new Tuple<>(damageModifier, function));
+            this.modifierFunctions.add(new DamageFunction(damageModifier, function));
         } else {
-            this.modifierFunctions.add(indexToAddBefore, new Tuple<>(damageModifier, function));
+            this.modifierFunctions.add(indexToAddBefore, new DamageFunction(damageModifier, function));
         }
         this.recalculateDamages(this.baseDamage);
     }
@@ -154,11 +155,29 @@ public abstract class AbstractDamageEntityEvent extends AbstractModifierEvent<Da
 
         }
         if (indexToAddAfter == -1) {
-            this.modifierFunctions.add(new Tuple<>(damageModifier, function));
+            this.modifierFunctions.add(new DamageFunction(damageModifier, function));
         } else {
-            this.modifierFunctions.add(indexToAddAfter + 1, new Tuple<>(damageModifier, function));
+            this.modifierFunctions.add(indexToAddAfter + 1, new DamageFunction(damageModifier, function));
         }
         this.recalculateDamages(this.baseDamage);
+    }
+
+    @Override
+    protected DamageFunction convertTuple(DamageModifier obj, Function<? super Double, Double> function) {
+        return new DamageFunction(obj, function);
+    }
+
+    @Override
+    public List<DamageFunction> getModifiers() {
+        ImmutableList.Builder<DamageFunction> builder = ImmutableList.builder();
+        for (Tuple<DamageModifier, Function<? super Double, Double>> entry : this.modifierFunctions) {
+            if (entry instanceof DamageFunction) {
+                builder.add((DamageFunction) entry);
+            } else {
+                builder.add(new DamageFunction(entry.getFirst(), entry.getSecond()));
+            }
+        }
+        return builder.build();
     }
 
     @Override
