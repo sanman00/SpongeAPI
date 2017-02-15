@@ -47,7 +47,6 @@ public abstract class AbstractDamageEntityEvent extends AbstractModifierEvent<Da
 
     @UseField protected double originalDamage;
     @UseField protected List<DamageFunction> originalFunctions;
-
     @UseField protected double baseDamage;
 
     @Override
