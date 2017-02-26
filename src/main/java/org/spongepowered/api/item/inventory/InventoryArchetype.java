@@ -26,6 +26,7 @@ package org.spongepowered.api.item.inventory;
 
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
@@ -35,6 +36,10 @@ import org.spongepowered.api.util.annotation.CatalogedBy;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 @CatalogedBy(InventoryArchetypes.class)
 public interface InventoryArchetype extends CatalogType {
@@ -92,6 +97,14 @@ public interface InventoryArchetype extends CatalogType {
     <T extends InventoryProperty<String, ?>> Optional<T> getProperty(Class<T> type, String key);
 
     /**
+     * Returns a Container for given inventory and player
+     * @param inventory The Player
+     * @param player The player
+     * @return The constructed Container
+     */
+    Container getContainer(Inventory inventory, Player player);
+
+    /**
      * A Builder for InventoryArchetypes.
      *
      * <p>Compositions of multiple base {@link InventoryArchetypes} are
@@ -128,6 +141,15 @@ public interface InventoryArchetype extends CatalogType {
          * @return Fluent pattern
          */
         Builder property(InventoryProperty<String, ?> property);
+
+        /**
+         * Sets the container provider. Use null to fallback to a basic container.
+         * TODO describe more / example? e.g. AnvilContainer can Repair basic container cannot.
+         *
+         * @param containerProvider the container provider
+         * @return Fluent pattern
+         */
+        Builder container(@Nullable BiFunction<Inventory, Player, Container> containerProvider);
 
         /**
          * Adds an {@link InventoryArchetype} to this Archetype.
