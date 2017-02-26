@@ -27,16 +27,16 @@ package org.spongepowered.api.event.impl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.spongepowered.api.event.cause.entity.ModifierFunction;
 import org.spongepowered.api.event.cause.entity.health.HealthFunction;
 import org.spongepowered.api.event.cause.entity.health.HealthModifier;
 import org.spongepowered.api.event.entity.HealEntityEvent;
-import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.util.annotation.eventgen.UseField;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.DoubleUnaryOperator;
 
 public abstract class AbstractHealEntityEvent extends AbstractModifierEvent<HealthFunction, HealthModifier> implements HealEntityEvent {
 
@@ -85,14 +85,14 @@ public abstract class AbstractHealEntityEvent extends AbstractModifierEvent<Heal
     }
 
     @Override
-    public final void setHealAmount(HealthModifier healthModifier, Function<? super Double, Double> function) {
+    public final void setHealAmount(HealthModifier healthModifier, DoubleUnaryOperator function) {
         checkNotNull(healthModifier, "Damage modifier was null!");
         checkNotNull(function, "Function was null!");
         int indexToAddTo = 0;
         boolean addAtEnd = true;
         for (Iterator<HealthFunction> iterator = this.modifierFunctions.iterator(); iterator.hasNext(); ) {
-            Tuple<HealthModifier, Function<? super Double, Double>> tuple = iterator.next();
-            if (tuple.getFirst().equals(healthModifier)) {
+            ModifierFunction<HealthModifier> tuple = iterator.next();
+            if (tuple.getModifier().equals(healthModifier)) {
                 iterator.remove();
                 addAtEnd = false;
                 break;
@@ -119,7 +119,7 @@ public abstract class AbstractHealEntityEvent extends AbstractModifierEvent<Heal
     }
 
     @Override
-    protected HealthFunction convertTuple(HealthModifier obj, Function<? super Double, Double> function) {
+    protected HealthFunction convertTuple(HealthModifier obj, DoubleUnaryOperator function) {
         return new HealthFunction(obj, function);
     }
 }

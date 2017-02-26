@@ -34,6 +34,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.projectile.arrow.Arrow;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.ModifierFunction;
 import org.spongepowered.api.event.cause.entity.damage.DamageFunction;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifierType;
@@ -56,6 +57,7 @@ import org.spongepowered.api.world.difficulty.Difficulty;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 
 /**
@@ -281,7 +283,7 @@ public interface AttackEntityEvent extends TargetEntityEvent, Cancellable {
      *
      * @return The list of damage modifier functions
      */
-    List<Tuple<DamageModifier, Function<? super Double, Double>>> getOriginalFunctions();
+    List<ModifierFunction<DamageModifier>> getOriginalFunctions();
 
     /**
      * Gets the "base" damage to deal to the targeted {@link Entity}. The
@@ -350,7 +352,7 @@ public interface AttackEntityEvent extends TargetEntityEvent, Cancellable {
      * @param damageModifier The damage modifier
      * @param function The function to map to the modifier
      */
-    void setOutputDamage(DamageModifier damageModifier, Function<? super Double, Double> function);
+    void setOutputDamage(DamageModifier damageModifier, DoubleUnaryOperator function);
 
     /**
      * Adds the provided {@link DamageModifier} and {@link Function} to the
@@ -363,7 +365,7 @@ public interface AttackEntityEvent extends TargetEntityEvent, Cancellable {
      * @param before The set containing the modifier types to come after
      *     the provided modifier
      */
-    void addDamageModifierBefore(DamageModifier damageModifier, Function<? super Double, Double> function, Set<DamageModifierType> before);
+    void addDamageModifierBefore(DamageModifier damageModifier, DoubleUnaryOperator function, Set<DamageModifierType> before);
 
     /**
      * Adds the provided {@link DamageModifier} and {@link Function} to the list
@@ -375,7 +377,7 @@ public interface AttackEntityEvent extends TargetEntityEvent, Cancellable {
      * @param function The associated function
      * @param after The set of modifier types to come before the new modifier
      */
-    void addDamageModifierAfter(DamageModifier damageModifier, Function<? super Double, Double> function, Set<DamageModifierType> after);
+    void addDamageModifierAfter(DamageModifier damageModifier, DoubleUnaryOperator function, Set<DamageModifierType> after);
 
     /**
      * Gets a list of simple {@link Tuple}s of {@link DamageModifier} keyed to

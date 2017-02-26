@@ -51,7 +51,7 @@ import org.spongepowered.api.world.difficulty.Difficulty;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.DoubleUnaryOperator;
 
 /**
  * Represents the base event for when an {@link Entity} is being "attacked".
@@ -241,10 +241,10 @@ public interface DamageEntityEvent extends TargetEntityEvent, Cancellable {
     /**
      * Sets the provided {@link Function} to be used for the given
      * {@link DamageModifier}. If the {@link DamageModifier} is already
-     * included in {@link #getModifiers()}, the {@link Function} replaces
+     * included in {@link #getModifiers()}, the {@link DoubleUnaryOperator} replaces
      * the existing function. If there is no {@link Tuple} for the
      * {@link DamageModifier}, a new one is created and added to the end
-     * of the list of {@link Function}s to be applied to the
+     * of the list of {@link DoubleUnaryOperator}s to be applied to the
      * {@link #getBaseDamage()}.
      *
      * <p>If needing to create a custom {@link DamageModifier} is required,
@@ -253,10 +253,10 @@ public interface DamageEntityEvent extends TargetEntityEvent, Cancellable {
      * @param damageModifier The damage modifier
      * @param function The function to map to the modifier
      */
-    void setDamage(DamageModifier damageModifier, Function<? super Double, Double> function);
+    void setDamage(DamageModifier damageModifier, DoubleUnaryOperator function);
 
     /**
-     * Adds the provided {@link DamageModifier} and {@link Function} to the
+     * Adds the provided {@link DamageModifier} and {@link DoubleUnaryOperator} to the
      * list of modifiers, such that the {@link Set} containing
      * {@link DamageModifierType}s provided in {@code before} will appear
      * after the provided damage modifier.
@@ -266,10 +266,10 @@ public interface DamageEntityEvent extends TargetEntityEvent, Cancellable {
      * @param before The set containing the modifier types to come after
      *     the provided modifier
      */
-    void addDamageModifierBefore(DamageModifier damageModifier, Function<? super Double, Double> function, Set<DamageModifierType> before);
+    void addDamageModifierBefore(DamageModifier damageModifier, DoubleUnaryOperator function, Set<DamageModifierType> before);
 
     /**
-     * Adds the provided {@link DamageModifier} and {@link Function} to the list
+     * Adds the provided {@link DamageModifier} and {@link DoubleUnaryOperator} to the list
      * of modifiers, such that the modifier will appear in order after any
      * current modifiers whose type are included in the provided {@link Set} of
      * {@link DamageModifierType}s.
@@ -278,7 +278,7 @@ public interface DamageEntityEvent extends TargetEntityEvent, Cancellable {
      * @param function The associated function
      * @param after The set of modifier types to come before the new modifier
      */
-    void addModifierAfter(DamageModifier damageModifier, Function<? super Double, Double> function, Set<DamageModifierType> after);
+    void addModifierAfter(DamageModifier damageModifier, DoubleUnaryOperator function, Set<DamageModifierType> after);
 
     /**
      * Gets a list of simple {@link Tuple}s of {@link DamageModifier} keyed to

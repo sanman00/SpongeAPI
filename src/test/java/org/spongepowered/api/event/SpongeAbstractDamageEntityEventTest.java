@@ -37,11 +37,10 @@ import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.entity.damage.DamageFunction;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifier;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
-import org.spongepowered.api.util.Tuple;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.DoubleUnaryOperator;
 
 public class SpongeAbstractDamageEntityEventTest {
 
@@ -147,7 +146,7 @@ public class SpongeAbstractDamageEntityEventTest {
 
         assertThat(event.getOriginalFunctions(), is(Matchers.equalTo(originalFunctions)));
 
-        Function<Double, Double> newFunction = p -> p;
+        DoubleUnaryOperator newFunction = p -> p;
 
         event.setDamage(firstModifer, newFunction);
 
@@ -185,7 +184,7 @@ public class SpongeAbstractDamageEntityEventTest {
         DamageModifier secondModifier = mockParam(DamageModifier.class);
         DamageModifier thirdModifier = mockParam(DamageModifier.class);
 
-        Function<Double, Double> thirdFunction = p -> p;
+        DoubleUnaryOperator thirdFunction = p -> p;
 
         List<DamageFunction>
                 originalFunctions = Lists.newArrayList(DamageFunction.of(firstModifer, p -> p * 2), DamageFunction.of(secondModifier, p -> p * 5));

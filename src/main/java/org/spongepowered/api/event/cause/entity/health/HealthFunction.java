@@ -24,23 +24,29 @@
  */
 package org.spongepowered.api.event.cause.entity.health;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.Objects;
-import org.spongepowered.api.util.Tuple;
+import org.spongepowered.api.event.cause.entity.ModifierFunction;
 
-import java.util.function.Function;
+import java.util.function.DoubleUnaryOperator;
 
-public class HealthFunction extends Tuple<HealthModifier, Function<? super Double, Double>> {
+public class HealthFunction implements ModifierFunction<HealthModifier> {
 
-    public static final Function<? super Double, Double> NO_HEALTH = value -> 0.0d;
+    public static final DoubleUnaryOperator NO_HEALTH = value -> 0.0d;
 
-    public static HealthFunction of(HealthModifier first, Function<? super Double, Double> second) {
+    public static HealthFunction of(HealthModifier first, DoubleUnaryOperator second) {
         return new HealthFunction(first, second);
     }
 
+    private final HealthModifier modifier;
+    private final DoubleUnaryOperator function;
+
     /**
      * Creates a new {@link HealthFunction} with the provided
-     * {@link HealthModifier}. The caveat is that the provided {@link Function}
-     * is by default going to provide {@code 0} healing modifications.
+     * {@link HealthModifier}. The caveat is that the provided
+     * {@link DoubleUnaryOperator} is by default going to provide {@code 0}
+     * healing modifications.
      *
      * @param modifier The damage modifier
      */
@@ -49,40 +55,43 @@ public class HealthFunction extends Tuple<HealthModifier, Function<? super Doubl
     }
 
     /**
-     *          o
+     * Creates a new {@link HealthFunction} with the provided
+     * {@link HealthModifier} and function.
+     * 
      * @param first
      * @param second
      */
-    public HealthFunction(HealthModifier first, Function<? super Double, Double> second) {
-        super(first, second);
+    public HealthFunction(HealthModifier modifier, DoubleUnaryOperator function) {
+        this.modifier = checkNotNull(modifier, "modifier");
+        this.function = checkNotNull(function, "function");
     }
 
     /**
      * Gets the {@link HealthModifier} for this function.
      *
      * @return The health modifier
-     * @see #getFirst()
      */
+    @Override
     public HealthModifier getModifier() {
-        return getFirst();
+        return this.modifier;
     }
 
     /**
-     * Gets the {@link Function} for this function.
+     * Gets the {@link DoubleUnaryOperator} for this function.
      *
      * @return The healing function
-     * @see #getSecond()
      */
-    public Function<? super Double, Double> getFunction() {
-        return getSecond();
+    @Override
+    public DoubleUnaryOperator getFunction() {
+        return this.function;
     }
 
 
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
-            .add("HealthModifer", getFirst())
-            .add("Function", getSecond())
+            .add("HealthModifer", this.modifier)
+            .add("Function", this.function)
             .toString();
     }
 }

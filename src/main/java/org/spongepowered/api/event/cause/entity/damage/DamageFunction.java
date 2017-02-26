@@ -24,18 +24,23 @@
  */
 package org.spongepowered.api.event.cause.entity.damage;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.Objects;
-import org.spongepowered.api.util.Tuple;
+import org.spongepowered.api.event.cause.entity.ModifierFunction;
 
-import java.util.function.Function;
+import java.util.function.DoubleUnaryOperator;
 
-public class DamageFunction extends Tuple<DamageModifier, Function<? super Double, Double>> {
+public class DamageFunction implements ModifierFunction<DamageModifier> {
 
-    public static final Function<? super Double, Double> ZERO_DAMAGE = value -> 0.0D;
+    public static final DoubleUnaryOperator ZERO_DAMAGE = value -> 0.0D;
 
-    public static DamageFunction of(DamageModifier first, Function<? super Double, Double> second) {
+    public static DamageFunction of(DamageModifier first, DoubleUnaryOperator second) {
         return new DamageFunction(first, second);
     }
+
+    private final DamageModifier modifier;
+    private final DoubleUnaryOperator function;
 
     /**
      * Creates a new {@link DamageFunction} with the provided
@@ -50,50 +55,41 @@ public class DamageFunction extends Tuple<DamageModifier, Function<? super Doubl
 
     /**
      * Creates a new {@link DamageFunction} with the provided
-     * {@link DamageModifier} and {@link Function}.
+     * {@link DamageModifier} and {@link DoubleUnaryOperator}.
      *
      * @param modifier The modifier
      * @param function The fucntion
      */
-    public DamageFunction(DamageModifier modifier, Function<? super Double, Double> function) {
-        super(modifier, function);
+    public DamageFunction(DamageModifier modifier, DoubleUnaryOperator function) {
+        this.modifier = checkNotNull(modifier, "modifier");
+        this.function = checkNotNull(function, "function");
     }
 
     /**
      * Gets the {@link DamageModifier} for this function.
      *
      * @return The damage modifier
-     * @see #getFirst()
      */
+    @Override
     public DamageModifier getModifier() {
-        return getFirst();
+        return this.modifier;
     }
 
     /**
-     * Gets the {@link Function} for this function.
+     * Gets the {@link DoubleUnaryOperator} for this function.
      *
      * @return The damage function
-     * @see #getSecond()
      */
-    public Function<? super Double, Double> getFunction() {
-        return getSecond();
-    }
-
     @Override
-    public DamageModifier getFirst() {
-        return super.getFirst();
-    }
-
-    @Override
-    public Function<? super Double, Double> getSecond() {
-        return super.getSecond();
+    public DoubleUnaryOperator getFunction() {
+        return this.function;
     }
 
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
-            .add("modifier", getModifier())
-            .add("function", getFunction())
-            .toString();
+                .add("modifier", getModifier())
+                .add("function", getFunction())
+                .toString();
     }
 }

@@ -37,16 +37,15 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.ResettableBuilder;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Represents a modifier that will apply a function on a damage value to
- * deal towards an entity such that the raw damage is the input of a
- * {@link Function} such that the output will be the final damage applied
- * to the {@link Entity}.
+ * Represents a modifier that will apply a function on a damage value to deal
+ * towards an entity such that the raw damage is the input of a
+ * {@link DoubleUnaryOperator} such that the output will be the final damage
+ * applied to the {@link Entity}.
  */
 @Immutable
 public interface DamageModifier {

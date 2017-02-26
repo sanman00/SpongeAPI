@@ -37,11 +37,10 @@ import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.entity.health.HealthFunction;
 import org.spongepowered.api.event.cause.entity.health.HealthModifier;
 import org.spongepowered.api.event.entity.HealEntityEvent;
-import org.spongepowered.api.util.Tuple;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.DoubleUnaryOperator;
 
 public class SpongeAbstractHealEntityEventTest {
 
@@ -147,7 +146,7 @@ public class SpongeAbstractHealEntityEventTest {
 
         assertThat(event.getOriginalFunctions(), is(Matchers.equalTo(originalFunctions)));
 
-        Function<Double, Double> newFunction = p -> p;
+        DoubleUnaryOperator newFunction = p -> p;
 
         event.setHealAmount(firstModifer, newFunction);
 
@@ -185,7 +184,7 @@ public class SpongeAbstractHealEntityEventTest {
         HealthModifier secondModifier = mockParam(HealthModifier.class);
         HealthModifier thirdModifier = mockParam(HealthModifier.class);
 
-        Function<Double, Double> thirdFunction = p -> p;
+        DoubleUnaryOperator thirdFunction = p -> p;
 
         List<HealthFunction>
                 originalFunctions = Lists.newArrayList(HealthFunction.of(firstModifer, p -> p * 2), HealthFunction.of(secondModifier, p -> p * 5));
