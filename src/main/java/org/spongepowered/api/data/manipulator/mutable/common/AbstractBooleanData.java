@@ -58,8 +58,7 @@ public abstract class AbstractBooleanData<M extends DataManipulator<M, I>, I ext
     }
 
     @Override
-    public DataContainer toContainer() {
-        return super.toContainer()
-                .set(this.usedKey.getQuery(), getValue());
+    protected void fillContainer(DataContainer container) {
+    	container.set(this.usedKey.getQuery(), getValue());
     }
 }

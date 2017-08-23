@@ -207,9 +207,15 @@ public abstract class AbstractData<M extends DataManipulator<M, I>, I extends Im
     }
 
     @Override
-    public DataContainer toContainer() {
-        return DataContainer.createNew()
-                .set(Queries.CONTENT_VERSION, getContentVersion());
+    public final DataContainer toContainer() {
+    	DataContainer container = DataContainer
+    			.createNew()
+    	        .set(Queries.CONTENT_VERSION, getContentVersion());
+    	fillContainer(container);
+    	
+        return container;
     }
+
+    protected abstract void fillContainer(DataContainer container);
 
 }

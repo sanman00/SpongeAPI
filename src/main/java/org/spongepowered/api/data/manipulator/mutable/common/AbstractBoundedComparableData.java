@@ -85,8 +85,7 @@ public abstract class AbstractBoundedComparableData<T extends Comparable<T>, M e
     }
 
     @Override
-    public DataContainer toContainer() {
-        return super.toContainer()
-                .set(this.usedKey.getQuery(), this.getValue());
+    protected void fillContainer(DataContainer container) {
+    	container.set(this.usedKey.getQuery(), this.getValue());
     }
 }
