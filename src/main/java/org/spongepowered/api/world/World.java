@@ -27,7 +27,6 @@ package org.spongepowered.api.world;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.entity.Entity;
@@ -456,5 +455,5 @@ public interface World extends Extent, WeatherUniverse, Viewer, ContextSource, M
      * 
      * @return The configuration of this world
      */
-    CommentedConfigurationNode getConfig();
+    WorldConfig getConfig();
 }
